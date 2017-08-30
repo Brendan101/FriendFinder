@@ -1,12 +1,16 @@
 package com.brenardo9956gmail.friendfinder;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +47,22 @@ public class FriendsListActivity extends AppCompatActivity implements View.OnCli
         addButton.setOnClickListener(this);
         friendsListView = (ListView) findViewById(R.id.friendListView);
 
+        //ability to remove friends
+        friendsListView.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        String friend = String.valueOf(parent.getItemAtPosition(position));
+                        //make sure the "friend" isn't the user's own email
+                        if(!friend.equals(fList.get(0))) {
+                            fList.remove(friend);
+                            updateAdapter();
+                        }
+                        return true;
+                    }
+                }
+        );
+
         //get friends list
         Intent intent = getIntent();
         fListString = intent.getStringExtra("fList");
@@ -55,21 +75,11 @@ public class FriendsListActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
     private void updateAdapter(){
 
         //skip over first "friend" (user's own email)
         String[] friend_array = new String[fList.size()-1];
-        fListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fList.subList(1, fList.size()-1).toArray(friend_array));
+        fListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fList.subList(1, fList.size()).toArray(friend_array));
         friendsListView.setAdapter(fListAdapter);
 
     }
@@ -92,6 +102,27 @@ public class FriendsListActivity extends AppCompatActivity implements View.OnCli
                 break;
 
         }
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        //send info back when this activity is exited
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            //convert list back to single string
+            String updatedList = "";
+            for(int i = 0; i < fList.size(); i++){
+                updatedList += fList.get(i) + " ";
+            }
+
+            Intent returnList = new Intent();
+            returnList.putExtra("fList", updatedList);
+            setResult(Activity.RESULT_OK, returnList);
+        }
+
+        return super.onKeyDown(keyCode, event);
 
     }
 }

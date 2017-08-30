@@ -2,6 +2,7 @@ package com.brenardo9956gmail.friendfinder;
 
 import android.*;
 import android.Manifest;
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -39,6 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public final String TAG = "FirebaseDB: ";
     public final long UPDATE_INTERVAL = 30000; //30 seconds
     public final float MAX_DISTANCE = 1000f;
+    public final int REQ_CODE = 1000;
 
     private GoogleMap mMap;
     LocationManager locMan;
@@ -193,15 +195,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     uname = "You";
                 }
 
-                //check that each user is within 1km
-                Location otherLoc = new Location("");
-                otherLoc.setLatitude(lat);
-                otherLoc.setLongitude(lon);
-                Float distance = userLoc.distanceTo(otherLoc);
-                if (distance < MAX_DISTANCE) {
-                    //finally update map
-                    mMap.addMarker(new MarkerOptions().position(userPos).title(uname));
-                }
+                //put this friend on the map
+                mMap.addMarker(new MarkerOptions().position(userPos).title(uname));
 
             }
 
@@ -238,9 +233,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             longitude = lon;
             time = currentTime;
 
-            //update this user's position and timestamp in database
-            User userForDatabase = new User(username, email, fList, latitude, longitude, time);
-            mDatabase.child("users").child(uid).setValue(userForDatabase);
+            updateUser();
 
             lastUserUpdate = currentTime;
         }
@@ -259,6 +252,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             lastFriendsUpdate = currentTime;
         }
+
+    }
+
+    private void updateUser() {
+
+        //update this user's information in the database
+        User userForDatabase = new User(username, email, fList, latitude, longitude, time);
+        mDatabase.child("users").child(uid).setValue(userForDatabase);
 
     }
 
@@ -287,11 +288,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //open up friends list
                 Intent friendIntent = new Intent(this, FriendsListActivity.class);
                 friendIntent.putExtra("fList", fList);
-                startActivity(friendIntent);
+                startActivityForResult(friendIntent, REQ_CODE);
                 break;
 
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //get updated friends list from friends edit activity
+        if (requestCode == REQ_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+                fList = data.getStringExtra("fList");
+                updateUser();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {/* EMPTY */}
+        }
     }
 
 

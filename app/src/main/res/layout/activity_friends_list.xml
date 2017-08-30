@@ -14,9 +14,8 @@
         android:id="@+id/friendTooltip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/blue"
         android:text="Enter Email Address"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1">
+        android:textAppearance="@style/HeaderText">
     </TextView>
 
     <EditText

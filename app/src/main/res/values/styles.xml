@@ -13,4 +13,9 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
+    <style name="HeaderText">
+    <item name="android:textSize">@dimen/abc_text_size_display_1_material</item>
+    <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>
