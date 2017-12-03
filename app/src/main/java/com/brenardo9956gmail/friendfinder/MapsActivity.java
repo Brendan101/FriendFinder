@@ -39,7 +39,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public final String TAG = "FirebaseDB: ";
     public final long UPDATE_INTERVAL = 30000; //30 seconds
-    public final float MAX_DISTANCE = 1000f;
     public final int REQ_CODE = 1000;
 
     private GoogleMap mMap;
@@ -229,6 +228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //update the user's info
         if(userReady && currentTime > lastUserUpdate + UPDATE_INTERVAL) {
+
             latitude = lat;
             longitude = lon;
             time = currentTime;
@@ -241,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //update the map
         if(mapReady && firstLoc) {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
-            mMap.setMinZoomPreference(14.0f);
+            mMap.setMinZoomPreference(13.0f);
             mMap.setMaxZoomPreference(20.0f);
             firstLoc = false;
         }
